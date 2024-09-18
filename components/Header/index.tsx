@@ -132,7 +132,7 @@ const Header = () => {
               </nav>
             </div>
             <button
-              className="min-w-[170px] py-3 px-4 text-base text-[rgba(248,250,252,1)] font-medium hover:opacity-70 flex gap-2 rounded-full bg-[rgba(37,99,235,1)]"
+              className="min-w-[170px] py-3 px-4 text-base text-[rgba(248,250,252,1)] font-medium hover:opacity-70 flex gap-2 rounded-full bg-[rgba(37,99,235,1)] hover:animate-pulse"
             >
               <Image
                 src="/images/header/rocket.svg"

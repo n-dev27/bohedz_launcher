@@ -1,5 +1,5 @@
 "use client";
-
+import { ConfigProvider } from 'antd';
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -20,12 +20,21 @@ export default function RootLayout({
       <head />
 
       <body className="dark:bg-black">
-        <Providers>
+        <ConfigProvider 
+          theme={{
+            components: {
+              Switch: {
+                handleSize: 20,
+                trackHeight: 24,
+              }
+            }
+          }}
+        >
           <Header />
           {children}
           <Footer />
           <ScrollToTop />
-        </Providers>
+        </ConfigProvider>
       </body>
     </html>
   );
