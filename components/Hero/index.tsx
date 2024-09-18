@@ -23,7 +23,7 @@ const Hero = () => {
                 <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
                   <Link
                     href="https://nextjstemplates.com/templates/startup"
-                    className="rounded-md bg-primary py-4 px-8 text-base font-semibold text-white duration-300 ease-in-out hover:bg-primary/80"
+                    className="rounded-md bg-[rgba(14,118,253,1)] py-4 px-8 text-base font-semibold text-white duration-300 ease-in-out hover:bg-primary/80"
                   >
                     Download Now
                   </Link>
