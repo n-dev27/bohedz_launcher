@@ -1,11 +1,21 @@
-import Link from "next/link";
+'use client'
+import { useState } from "react";
+import { FaRegStar, FaStar } from "react-icons/fa";
 
 const Hero = () => {
+  const [stars, setStars] = useState([false, false, false, false, false]); // Track star states
+
+  const toggleStar = (index: number) => {
+    const newStars = [...stars];
+    newStars[index] = !newStars[index]; // Toggle the clicked star
+    setStars(newStars);
+  };
+
   return (
     <>
       <section
         id="home"
-        className="relative z-10 overflow-hidden pt-[120px] pb-16 md:pt-[150px] md:pb-[120px] xl:pt-[180px] xl:pb-[160px] 2xl:pt-[210px] 2xl:pb-[200px]"
+        className="relative z-10 overflow-hidden pt-[120px] pb-16"
       >
         <div className="container">
           <div className="-mx-4 flex flex-wrap">
@@ -14,25 +24,25 @@ const Hero = () => {
                 className="wow fadeInUp mx-auto max-w-[800px] text-center"
                 data-wow-delay=".2s"
               >
-                <h1 className="mb-5 text-3xl font-bold leading-tight text-black dark:text-white sm:text-4xl sm:leading-tight md:text-5xl md:leading-tight">
-                Free and Open-Source Next.js Template for Startup & SaaS
+                <h1 className="mb-5 text-3xl font-bold leading-tight text-[rgba(15,23,42,1)] sm:text-4xl sm:leading-tight md:text-5xl md:leading-tight">
+                  Design Your Token
                 </h1>
-                <p className="mb-12 text-base font-medium !leading-relaxed text-body-color dark:text-white dark:opacity-90 sm:text-lg md:text-xl">
-                Startup is free Next.js template for startups and SaaS business websites comes with all the essential pages, components, and sections you need to launch a complete business website, built-with Next 13.x and Tailwind CSS.
+                <p className="mb-12 text-sm font-medium !leading-relaxed text-[rgba(51,65,85,1)] sm:text-base md:text-lg">
+                  The ideal deflationary token, includes all standard features from the ERC20
+                  standard with many additional utilities! You can customize your token with options
+                  such as max wallet limit, transaction limits, buy and sell fees, and more!
                 </p>
-                <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-                  <Link
-                    href="https://nextjstemplates.com/templates/startup"
-                    className="rounded-md bg-[rgba(14,118,253,1)] py-4 px-8 text-base font-semibold text-white duration-300 ease-in-out hover:bg-primary/80"
-                  >
-                    Download Now
-                  </Link>
-                  <Link
-                    href="https://github.com/NextJSTemplates/startup-nextjs"
-                    className="rounded-md bg-black/20 py-4 px-8 text-base font-semibold text-black duration-300 ease-in-out hover:bg-black/30 dark:bg-white/20 dark:text-white dark:hover:bg-white/30"
-                  >
-                    Star on GitHub
-                  </Link>
+                <div className="flex flex-row items-center justify-center gap-2">
+                  <div className="flex flex-row items-center justify-center gap-1">
+                    {stars.map((isStarred, index) => (
+                      isStarred ? (
+                        <FaStar key={index} className="w-6 h-6 cursor-pointer text-[rgba(59,130,246,1)]" onClick={() => toggleStar(index)} />
+                      ) : (
+                        <FaRegStar key={index} className="w-6 h-6 cursor-pointer text-[rgba(59,130,246,1)]" onClick={() => toggleStar(index)} />
+                      )
+                    ))}
+                  </div>
+                  <p className="text-[rgba(2,8,23,1)] text-sm font-bold">{(stars.filter(Boolean).length / stars.length * 5).toFixed(2)} / 5 ({stars.length} Ratings)</p>
                 </div>
               </div>
             </div>

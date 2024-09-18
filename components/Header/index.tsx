@@ -90,7 +90,7 @@ const Header = () => {
                   <li key={menuItem.id} className="!m-0">
                     <Link
                       href={menuItem.path}
-                      className={`flex justify-center text-center gap-2 py-2 text-sm text-[rgba(2,8,23,1)] group-hover:opacity-70 xl:mr-0 xl:inline-flex xl:py-6 xl:px-0`}
+                      className={`flex justify-center text-center gap-2 py-2 text-sm text-[rgba(2,8,23,1)] hover:opacity-70 xl:mr-0 xl:inline-flex xl:py-6 xl:px-0`}
                     >
                       <Image
                         src={menuItem.img}
