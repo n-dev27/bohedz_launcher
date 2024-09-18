@@ -15,7 +15,7 @@ const Hero = () => {
     <>
       <section
         id="home"
-        className="relative z-10 overflow-hidden pt-[120px] pb-16"
+        className="relative z-10 overflow-hidden pt-[120px] pb-[90px]"
       >
         <div className="container">
           <div className="-mx-4 flex flex-wrap">
