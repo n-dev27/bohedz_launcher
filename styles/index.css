@@ -46,6 +46,17 @@
 .input_css {
   background: rgba(255, 255, 255, 1);
   border-radius: 6px;
-  color: rgba(100, 116, 139, 1);
+  color: rgba(2, 8, 23, 1);
   font-size: 14px;
+  max-height: 48px;
+  display: flex;
+  align-items: center;
+
+  &::placeholder {
+    color: rgba(100, 116, 139, 1); /* Placeholder color */
+  }
+}
+
+.dashboard_selector .ant-segmented-item {
+  width: 50%;
 }

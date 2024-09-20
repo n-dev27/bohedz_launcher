@@ -26,7 +26,11 @@ export default function RootLayout({
               Switch: {
                 handleSize: 20,
                 trackHeight: 24,
-              }
+              },
+              Slider: {
+                handleSize: 16,
+                handleColor: '#2563EB'
+              },
             }
           }}
         >
