@@ -348,11 +348,11 @@ const Features = () => {
                             size='large'
                           />
                           <div 
-                            className='absolute flex gap-2 right-[8%] top-[56%] md:top-[53%] cursor-pointer'
+                            className='absolute flex gap-1 sm:gap-2 right-[8%] top-[56%] md:top-[53%] cursor-pointer'
                             onClick={() => setWalletCount(98)}
                           >
-                            <span className="text-[0.7rem] md:text-sm font-bold">Max</span>
-                            <span className='text-[0.7rem] md:text-sm'>98</span>
+                            <span className="text-[0.7rem] sm:text-sm font-bold">Max</span>
+                            <span className='text-[0.7rem] sm:text-sm'>98</span>
                           </div>
                         </div>
                         <div className='w-full flex flex-col md:flex-row gap-4'>
