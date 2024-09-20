@@ -59,6 +59,8 @@ const Features = () => {
   const [ownWalletCount, setOwnWalletCount] = useState<number>(0);
   const [viewPKList, setViewPKList] = useState<boolean[]>([]); // New state for view PK
   const [totalSupply, setTotalSupply] = useState<number>(0);
+  const [bundleFlag, setBundleFlag] = useState<boolean>(false);
+  const [liqFlag, setLiqFlag] = useState<boolean>(false);
 
   const handleNetworkChange = (value: string) => {
     setSelectNetworkValue(value);
@@ -327,258 +329,264 @@ const Features = () => {
             {/* ----------------- Fourth Section ----------------- */}
             <div className="card_css">
               <div className='flex flex-col'>
-                <div className="w-full flex justify-between items-center gap-4 md:gap-0 p-4 border-b-[1px] border-[rgba(226,232,240,1)]">
+                <div className="w-full flex justify-between items-center gap-4 md:gap-0 p-4">
                   <div className="flex flex-col gap-1">
                     <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Add Bundle Wallets</p>
                     <p className="text-[rgba(100,116,139,1)] text-[0.7rem] md:text-sm font-normal">Add wallets to bundle buy your own launch to ensure you can buy BEFORE snipers.</p>
                   </div>
-                  <Switch className="bg-[#E2E8F0]"/>
+                  <Switch className="bg-[#E2E8F0]" value={bundleFlag} onChange={(value: boolean) => setBundleFlag(value)} />
                 </div>
-                <div className="w-full flex items-center gap-4 md:gap-0 p-4">
-                  <div className="w-full flex flex-col gap-1">
-                    <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Generate Fresh Wallets or Use Existing Wallets?</p>
-                    <p className="text-[rgba(100,116,139,1)] text-[0.7rem] md:text-sm font-normal">You can instruct the bot to generate fresh wallets to use within your bundle, or add your own wallets to include within the bundle.<br /> Please select which option you’d like to take:</p>
-                    <Segmented
-                      className='w-full flex justify-center items-center p-1 dashboard_selector'
-                      size='large'
-                      value={walletTab}
-                      style={{ marginBottom: 8 }} // Adjust maxWidth as needed
-                      onChange={(value) => setWalletTab(value)}
-                      options={walletTabOption}
-                    />
-                    {walletTab === '1' ? (
-                      <div className='w-full flex flex-col gap-2'>
-                        <div className='relative w-full md:w-1/2 flex flex-col gap-2 md:pr-2'>
-                          <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">How many wallets would you like to add to bundle?</p>
-                          <Input 
-                            className="input_css p-3 w-full" 
-                            value={freshWalletCount}
-                            onChange={(event) => setFreshWalletCount(Number(event.target.value))}
-                            type='number'
-                            placeholder='3'
-                            max={98}
-                          />
-                          <div 
-                            className='absolute flex gap-1 sm:gap-2 right-[6%] top-[56%] md:top-[54%] cursor-pointer'
-                            onClick={() => setFreshWalletCount(98)}
-                          >
-                            <span className="text-[0.7rem] sm:text-sm font-bold">Max</span>
-                            <span className='text-[0.7rem] sm:text-sm'>98</span>
+                {bundleFlag === true && (
+                  <div className="w-full flex items-center gap-4 md:gap-0 p-4 border-t-[1px] border-[rgba(226,232,240,1)]">
+                    <div className="w-full flex flex-col gap-1">
+                      <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Generate Fresh Wallets or Use Existing Wallets?</p>
+                      <p className="text-[rgba(100,116,139,1)] text-[0.7rem] md:text-sm font-normal">You can instruct the bot to generate fresh wallets to use within your bundle, or add your own wallets to include within the bundle.<br /> Please select which option you’d like to take:</p>
+                      <Segmented
+                        className='w-full flex justify-center items-center p-1 dashboard_selector'
+                        size='large'
+                        value={walletTab}
+                        style={{ marginBottom: 8 }} // Adjust maxWidth as needed
+                        onChange={(value) => setWalletTab(value)}
+                        options={walletTabOption}
+                      />
+                      {walletTab === '1' ? (
+                        <div className='w-full flex flex-col gap-2'>
+                          <div className='relative w-full md:w-1/2 flex flex-col gap-2 md:pr-2'>
+                            <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">How many wallets would you like to add to bundle?</p>
+                            <Input 
+                              className="input_css p-3 w-full" 
+                              value={freshWalletCount}
+                              onChange={(event) => setFreshWalletCount(Number(event.target.value))}
+                              type='number'
+                              placeholder='3'
+                              max={98}
+                            />
+                            <div 
+                              className='absolute flex gap-1 sm:gap-2 right-[6%] top-[56%] md:top-[54%] cursor-pointer'
+                              onClick={() => setFreshWalletCount(98)}
+                            >
+                              <span className="text-[0.7rem] sm:text-sm font-bold">Max</span>
+                              <span className='text-[0.7rem] sm:text-sm'>98</span>
+                            </div>
+                          </div>
+                          <div className='w-full flex flex-col gap-2'>
+                            {Array.from({ length: freshWalletCount }).map((_, index) => ( // Dynamically create wallet input fields
+                              <div className='w-full flex flex-col md:flex-row gap-1 md:gap-4'>
+                                <div key={index} className='relative w-full md:w-1/2 flex flex-col gap-1'>
+                                  {index === 0 && <p className="absolute right-0 text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-bold cursor-pointer">Export All PKs</p>}
+                                  <div className='w-full flex justify-start items-center'>
+                                    <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Wallet {index + 1}:</p>
+                                  </div>
+                                  <div className='relative'>
+                                    <Input 
+                                      className="input_css p-3" 
+                                      placeholder="0x83792HSL28m12499SKJSD9300n12" 
+                                      type={viewPKList[index] ? 'text' : 'password'}
+                                    />
+                                    <div className='absolute right-[2%] top-[35%] cursor-pointer' onClick={() => {
+                                      setViewPKList(prev => {
+                                        const newList = [...prev];
+                                        newList[index] = !newList[index]; // Toggle visibility
+                                        return newList;
+                                      });
+                                    }}>
+                                      {viewPKList[index] ? <GoEyeClosed /> : <GoEye />}
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className='w-full md:w-1/2 flex flex-col md:flex-row gap-2'>
+                                  <div className='w-full md:w-1/2 flex flex-col gap-1'>
+                                    <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Buy Settings</p>
+                                    <Input className="input_css p-3 w-full" type='number'/>
+                                  </div>
+                                  <div className='w-full md:w-1/2 flex flex-col gap-2'>
+                                    <div className='w-full flex justify-between items-center'>
+                                      <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Auto Set</p>
+                                      <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Set Manually</p>
+                                    </div>
+                                    <Input className="input_css p-3 w-full" type='number' />
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
                           </div>
                         </div>
+                      ) : (
                         <div className='w-full flex flex-col gap-2'>
-                          {Array.from({ length: freshWalletCount }).map((_, index) => ( // Dynamically create wallet input fields
-                            <div className='w-full flex flex-col md:flex-row gap-1 md:gap-4'>
-                              <div key={index} className='relative w-full md:w-1/2 flex flex-col gap-1'>
-                                {index === 0 && <p className="absolute right-0 text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-bold cursor-pointer">Export All PKs</p>}
-                                <div className='w-full flex justify-start items-center'>
-                                  <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Wallet {index + 1}:</p>
-                                </div>
-                                <div className='relative'>
-                                  <Input 
-                                    className="input_css p-3" 
-                                    placeholder="0x83792HSL28m12499SKJSD9300n12" 
-                                    type={viewPKList[index] ? 'text' : 'password'}
-                                  />
-                                  <div className='absolute right-[2%] top-[35%] cursor-pointer' onClick={() => {
-                                    setViewPKList(prev => {
-                                      const newList = [...prev];
-                                      newList[index] = !newList[index]; // Toggle visibility
-                                      return newList;
-                                    });
-                                  }}>
-                                    {viewPKList[index] ? <GoEyeClosed /> : <GoEye />}
-                                  </div>
-                                </div>
-                              </div>
-                              <div className='w-full md:w-1/2 flex flex-col md:flex-row gap-2'>
-                                <div className='w-full md:w-1/2 flex flex-col gap-1'>
-                                  <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Buy Settings</p>
-                                  <Input className="input_css p-3 w-full" type='number'/>
-                                </div>
-                                <div className='w-full md:w-1/2 flex flex-col gap-2'>
-                                  <div className='w-full flex justify-between items-center'>
-                                    <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Auto Set</p>
-                                    <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Set Manually</p>
-                                  </div>
-                                  <Input className="input_css p-3 w-full" type='number' />
-                                </div>
-                              </div>
+                          <div className='relative w-full md:w-1/2 flex flex-col gap-2 md:pr-2'>
+                            <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">How many wallets would you like to add to bundle?</p>
+                            <Input 
+                              className="input_css p-3 w-full" 
+                              value={ownWalletCount}
+                              onChange={(event) => setOwnWalletCount(Number(event.target.value))}
+                              type='number'
+                              max={98}
+                            />
+                            <div 
+                              className='absolute flex gap-1 sm:gap-2 right-[6%] top-[56%] md:top-[54%] cursor-pointer'
+                              onClick={() => setOwnWalletCount(98)}
+                            >
+                              <span className="text-[0.7rem] sm:text-sm font-bold">Max</span>
+                              <span className='text-[0.7rem] sm:text-sm'>98</span>
                             </div>
-                          ))}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className='w-full flex flex-col gap-2'>
-                        <div className='relative w-full md:w-1/2 flex flex-col gap-2 md:pr-2'>
-                          <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">How many wallets would you like to add to bundle?</p>
-                          <Input 
-                            className="input_css p-3 w-full" 
-                            value={ownWalletCount}
-                            onChange={(event) => setOwnWalletCount(Number(event.target.value))}
-                            type='number'
-                            max={98}
-                          />
-                          <div 
-                            className='absolute flex gap-1 sm:gap-2 right-[6%] top-[56%] md:top-[54%] cursor-pointer'
-                            onClick={() => setOwnWalletCount(98)}
-                          >
-                            <span className="text-[0.7rem] sm:text-sm font-bold">Max</span>
-                            <span className='text-[0.7rem] sm:text-sm'>98</span>
+                          </div>
+                          <div className='w-full flex flex-col gap-2'>
+                            {Array.from({ length: ownWalletCount }).map((_, index) => ( // Dynamically create wallet input fields
+                              <div className='w-full flex flex-col md:flex-row gap-1 md:gap-4'>
+                                <div key={index} className='relative w-full md:w-1/2 flex flex-col gap-1'>
+                                  {index === 0 && <p className="absolute right-0 text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-bold cursor-pointer">Import PKs</p>}
+                                  <div className='w-full flex justify-start items-center'>
+                                    <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Wallet {index + 1}:</p>
+                                  </div>
+                                  <div className='relative'>
+                                    <Input 
+                                      className="input_css p-3" 
+                                      placeholder="0x83792HSL28m12499SKJSD9300n12" 
+                                      type={viewPKList[index] ? 'text' : 'password'}
+                                    />
+                                    <div className='absolute right-[2%] top-[35%] cursor-pointer' onClick={() => {
+                                      setViewPKList(prev => {
+                                        const newList = [...prev];
+                                        newList[index] = !newList[index]; // Toggle visibility
+                                        return newList;
+                                      });
+                                    }}>
+                                      {viewPKList[index] ? <GoEyeClosed /> : <GoEye />}
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className='w-full md:w-1/2 flex flex-col md:flex-row gap-2'>
+                                  <div className='w-full md:w-1/2 flex flex-col gap-1'>
+                                    <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Buy Settings</p>
+                                    <Input className="input_css p-3 w-full" type='number' />
+                                  </div>
+                                  <div className='w-full md:w-1/2 flex flex-col gap-2'>
+                                    <div className='w-full flex justify-between items-center'>
+                                      <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Auto Set</p>
+                                      <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Set Manually</p>
+                                    </div>
+                                    <Input className="input_css p-3 w-full" type='number' />
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
                           </div>
                         </div>
-                        <div className='w-full flex flex-col gap-2'>
-                          {Array.from({ length: ownWalletCount }).map((_, index) => ( // Dynamically create wallet input fields
-                            <div className='w-full flex flex-col md:flex-row gap-1 md:gap-4'>
-                              <div key={index} className='relative w-full md:w-1/2 flex flex-col gap-1'>
-                                {index === 0 && <p className="absolute right-0 text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-bold cursor-pointer">Import PKs</p>}
-                                <div className='w-full flex justify-start items-center'>
-                                  <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Wallet {index + 1}:</p>
-                                </div>
-                                <div className='relative'>
-                                  <Input 
-                                    className="input_css p-3" 
-                                    placeholder="0x83792HSL28m12499SKJSD9300n12" 
-                                    type={viewPKList[index] ? 'text' : 'password'}
-                                  />
-                                  <div className='absolute right-[2%] top-[35%] cursor-pointer' onClick={() => {
-                                    setViewPKList(prev => {
-                                      const newList = [...prev];
-                                      newList[index] = !newList[index]; // Toggle visibility
-                                      return newList;
-                                    });
-                                  }}>
-                                    {viewPKList[index] ? <GoEyeClosed /> : <GoEye />}
-                                  </div>
-                                </div>
-                              </div>
-                              <div className='w-full md:w-1/2 flex flex-col md:flex-row gap-2'>
-                                <div className='w-full md:w-1/2 flex flex-col gap-1'>
-                                  <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Buy Settings</p>
-                                  <Input className="input_css p-3 w-full" type='number' />
-                                </div>
-                                <div className='w-full md:w-1/2 flex flex-col gap-2'>
-                                  <div className='w-full flex justify-between items-center'>
-                                    <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Auto Set</p>
-                                    <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Set Manually</p>
-                                  </div>
-                                  <Input className="input_css p-3 w-full" type='number' />
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
 
             {/* ----------------- Fifth Section ----------------- */}
             <div className="card_css">
               <div className='flex flex-col'>
-                <div className="w-full flex justify-between items-center gap-4 md:gap-0 p-4 border-b-[1px] border-[rgba(226,232,240,1)]">
+                <div className="w-full flex justify-between items-center gap-4 md:gap-0 p-4">
                   <div className="flex flex-col gap-1">
                     <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Add Initial Liquidity</p>
                     <p className="text-[rgba(100,116,139,1)] text-[0.7rem] md:text-sm font-normal">Automatically create and fund the liquidity pool, this will allow users to buy your token.</p>
                   </div>
-                  <Switch className="bg-[#E2E8F0]"/>
+                  <Switch className="bg-[#E2E8F0]" value={liqFlag} onChange={(value: boolean) => setLiqFlag(value)} />
                 </div>
-                <div className="w-full flex flex-col items-center gap-4 p-4 border-b-[1px] border-[rgba(226,232,240,1)]">
-                  <div className="w-full flex flex-col gap-1">
-                    <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Token Paring & Funding</p>
-                    <p className="text-[rgba(100,116,139,1)] text-[0.7rem] md:text-sm font-normal">Pair a percentage of your token supply with ETH to fund the liquidity pool. We recommend pairing at least 10% of your token supply with at least 1 ETH.</p>
-                  </div>
-                  <div className='w-full flex flex-col sm:flex-row gap-4 sm:gap-10'>
-                    <div className='w-full sm:w-1/2 flex flex-col gap-2'>
-                      <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Token Supply (%)</p>
-                      <div className='inline-flex items-center gap-4'>
-                        <Slider className='flex-1' value={totalSupply} onChange={(value: number) => setTotalSupply(value)}/>
-                        <p className="text-[rgba(2,8,23,1)] text-xs md:text-base font-normal">{totalSupply}%</p>
+                {liqFlag === true && (
+                  <>
+                    <div className="w-full flex flex-col items-center gap-4 p-4 border-t-[1px] border-[rgba(226,232,240,1)]">
+                    <div className="w-full flex flex-col gap-1">
+                      <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Token Paring & Funding</p>
+                      <p className="text-[rgba(100,116,139,1)] text-[0.7rem] md:text-sm font-normal">Pair a percentage of your token supply with ETH to fund the liquidity pool. We recommend pairing at least 10% of your token supply with at least 1 ETH.</p>
+                    </div>
+                    <div className='w-full flex flex-col sm:flex-row gap-4 sm:gap-10'>
+                      <div className='w-full sm:w-1/2 flex flex-col gap-2'>
+                        <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Token Supply (%)</p>
+                        <div className='inline-flex items-center gap-4'>
+                          <Slider className='flex-1' value={totalSupply} onChange={(value: number) => setTotalSupply(value)}/>
+                          <p className="text-[rgba(2,8,23,1)] text-xs md:text-base font-normal">{totalSupply}%</p>
+                        </div>
+                      </div>
+                      <div className='w-full sm:w-1/2 flex flex-col gap-2'>
+                        <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">ETH Amount</p>
+                        <Input 
+                          className="input_css p-3 w-full" 
+                          type='number'
+                          placeholder='1'
+                        />
                       </div>
                     </div>
-                    <div className='w-full sm:w-1/2 flex flex-col gap-2'>
-                      <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">ETH Amount</p>
-                      <Input 
-                        className="input_css p-3 w-full" 
-                        type='number'
-                        placeholder='1'
+                    <div className='relative w-full flex flex-col sm:flex-row gap-4 sm:gap-7 justify-center items-center'>
+                      <div className='relative w-full'>
+                        <Input 
+                          className="input_css !min-h-[74px] text-start sm:text-end pt-[30px] pl-[4.5%] sm:pr-[4%] p-3 w-full" 
+                          type='number'
+                          placeholder='1,000,000,000'
+                        />
+                        <p className='absolute left-[5%] sm:left-[unset] sm:right-[5%] w-max top-[20%] text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium'>Token</p>
+                      </div>
+                      <button 
+                        className='absolute left-[calc(50%-24px)] z-10 w-12 h-12 rounded-full border-2 border-[rgba(226,232,240,1)] flex justify-center items-center bg-white'
+                        onClick={() => handleAddTaxWallet()}
+                      >
+                        <FaPlus className='text-[rgba(38,99,235,1)] w-10 h-10'/>
+                      </button>
+                      <div className='relative w-full'>
+                        <Input 
+                          className="input_css !min-h-[74px] text-start pt-[30px] pl-[4.5%] p-3 w-full" 
+                          type='number'
+                          placeholder='1.00'
+                        />
+                        <p className='absolute left-[5%] top-[20%] text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium'>ETH</p>
+                      </div>
+                    </div>
+                    <div className='w-full'>
+                      <p className="text-[rgba(100,116,139,1)] text-[0.7rem] md:text-sm font-normal">Based on the selected options and values above, your token will launch with the following initial parameters, including the starting market cap and the starting price of your token.</p>
+                    </div>
+                    <div className='w-full flex flex-col sm:flex-row gap-4 sm:gap-7 justify-center items-center'>
+                      <div className='relative w-full'>
+                        <Input 
+                          className="input_css !min-h-[74px] text-start pt-[30px] pl-[4.5%] sm:pr-[4%] p-3 w-full" 
+                          placeholder='1.00 ETH (~2,414.47 USD)'
+                        />
+                        <p className='absolute left-[5%] top-[18%] text-[rgba(2,8,23,1)] text-xs md:text-base font-medium'>Launch Market Cap</p>
+                      </div>
+                      <div className='relative w-full'>
+                        <Input 
+                          className="input_css !min-h-[74px] text-start pt-[30px] pl-[4.5%] p-3 w-full" 
+                          placeholder='0.00000 ETH (~0.00 USD)'
+                        />
+                        <p className='absolute left-[5%] top-[18%] text-[rgba(2,8,23,1)] text-xs md:text-base font-medium'>Launch Token Price</p>
+                      </div>
+                    </div>
+                    </div>
+                    <div className="w-full flex flex-col items-center gap-4 p-4 border-t-[1px] border-[rgba(226,232,240,1)]">
+                      <div className="w-full flex flex-col gap-1">
+                        <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Exchange (DEX)</p>
+                        <p className="text-[rgba(100,116,139,1)] text-[0.7rem] md:text-sm font-normal">We'll use the selected DEX to create your liquidity pair and seed the initial pool.</p>
+                      </div>
+                      <Select 
+                        className='w-full h-12'
+                        value={selectExchangeDex}
+                        onChange={setSelectExchangeDex}
+                        options={exchangeOption}
                       />
                     </div>
-                  </div>
-                  <div className='relative w-full flex flex-col sm:flex-row gap-4 sm:gap-7 justify-center items-center'>
-                    <div className='relative w-full'>
-                      <Input 
-                        className="input_css !min-h-[74px] text-start sm:text-end pt-[30px] pl-[4.5%] sm:pr-[4%] p-3 w-full" 
-                        type='number'
-                        placeholder='1,000,000,000'
+                    <div className="w-full flex flex-col items-center gap-4 p-4 border-t-[1px] border-[rgba(226,232,240,1)]">
+                      <div className="w-full flex flex-col gap-1">
+                        <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Liquidity Action & Ownership</p>
+                        <p className="text-[rgba(100,116,139,1)] text-[0.7rem] md:text-sm font-normal">By default, the liquidity will locked for 6 months. However, you can also choose to adjust the length of time liquidity is locked here.</p>
+                      </div>
+                      <Segmented
+                        className='w-full flex justify-center items-center p-1 dashboard_selector'
+                        size='large'
+                        value={liqTab}
+                        onChange={(value) => setLiqTab(value)}
+                        options={liqTabOption}
                       />
-                      <p className='absolute left-[5%] sm:left-[unset] sm:right-[5%] w-max top-[20%] text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium'>Token</p>
+                      <div className='w-full'>
+                        <p className="text-[rgba(100,116,139,1)] text-[0.7rem] md:text-sm font-normal">Liquidity will automatically be locked for the above duration when trading is enabled. Bohedz will retain the ownership of the liquidity as it’s Service Fee.</p>
+                      </div>
                     </div>
-                    <button 
-                      className='absolute left-[calc(50%-24px)] z-10 w-12 h-12 rounded-full border-2 border-[rgba(226,232,240,1)] flex justify-center items-center bg-white'
-                      onClick={() => handleAddTaxWallet()}
-                    >
-                      <FaPlus className='text-[rgba(38,99,235,1)] w-10 h-10'/>
-                    </button>
-                    <div className='relative w-full'>
-                      <Input 
-                        className="input_css !min-h-[74px] text-start pt-[30px] pl-[4.5%] p-3 w-full" 
-                        type='number'
-                        placeholder='1.00'
-                      />
-                      <p className='absolute left-[5%] top-[20%] text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium'>ETH</p>
-                    </div>
-                  </div>
-                  <div className='w-full'>
-                    <p className="text-[rgba(100,116,139,1)] text-[0.7rem] md:text-sm font-normal">Based on the selected options and values above, your token will launch with the following initial parameters, including the starting market cap and the starting price of your token.</p>
-                  </div>
-                  <div className='w-full flex flex-col sm:flex-row gap-4 sm:gap-7 justify-center items-center'>
-                    <div className='relative w-full'>
-                      <Input 
-                        className="input_css !min-h-[74px] text-start pt-[30px] pl-[4.5%] sm:pr-[4%] p-3 w-full" 
-                        placeholder='1.00 ETH (~2,414.47 USD)'
-                      />
-                      <p className='absolute left-[5%] top-[18%] text-[rgba(2,8,23,1)] text-xs md:text-base font-medium'>Launch Market Cap</p>
-                    </div>
-                    <div className='relative w-full'>
-                      <Input 
-                        className="input_css !min-h-[74px] text-start pt-[30px] pl-[4.5%] p-3 w-full" 
-                        placeholder='0.00000 ETH (~0.00 USD)'
-                      />
-                      <p className='absolute left-[5%] top-[18%] text-[rgba(2,8,23,1)] text-xs md:text-base font-medium'>Launch Token Price</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="w-full flex flex-col items-center gap-4 p-4 border-b-[1px] border-[rgba(226,232,240,1)]">
-                  <div className="w-full flex flex-col gap-1">
-                    <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Exchange (DEX)</p>
-                    <p className="text-[rgba(100,116,139,1)] text-[0.7rem] md:text-sm font-normal">We'll use the selected DEX to create your liquidity pair and seed the initial pool.</p>
-                  </div>
-                  <Select 
-                    className='w-full h-12'
-                    value={selectExchangeDex}
-                    onChange={setSelectExchangeDex}
-                    options={exchangeOption}
-                  />
-                </div>
-                <div className="w-full flex flex-col items-center gap-4 p-4">
-                  <div className="w-full flex flex-col gap-1">
-                    <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Liquidity Action & Ownership</p>
-                    <p className="text-[rgba(100,116,139,1)] text-[0.7rem] md:text-sm font-normal">By default, the liquidity will locked for 6 months. However, you can also choose to adjust the length of time liquidity is locked here.</p>
-                  </div>
-                  <Segmented
-                    className='w-full flex justify-center items-center p-1 dashboard_selector'
-                    size='large'
-                    value={liqTab}
-                    onChange={(value) => setLiqTab(value)}
-                    options={liqTabOption}
-                  />
-                  <div className='w-full'>
-                    <p className="text-[rgba(100,116,139,1)] text-[0.7rem] md:text-sm font-normal">Liquidity will automatically be locked for the above duration when trading is enabled. Bohedz will retain the ownership of the liquidity as it’s Service Fee.</p>
-                  </div>
-                </div>
+                  </>
+                )}
               </div>
             </div>
 
