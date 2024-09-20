@@ -187,7 +187,7 @@ const Features = () => {
             <div className='card_css'>
               <div className='flex flex-col gap-3 p-4'>
                 <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Token Supply</p>
-                <InputNumber className="input_css p-3 w-full" min={1}/>
+                <Input className="input_css p-3 w-full" type='number' placeholder='1000000'/>
               </div>
             </div>
 
@@ -350,13 +350,13 @@ const Features = () => {
                       <div className='w-full flex flex-col gap-2'>
                         <div className='relative w-full md:w-1/2 flex flex-col gap-2 md:pr-2'>
                           <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">How many wallets would you like to add to bundle?</p>
-                          <InputNumber 
+                          <Input 
                             className="input_css p-3 w-full" 
                             value={freshWalletCount}
-                            onChange={(value: number) => setFreshWalletCount(value)}
-                            min={1} 
+                            onChange={(event) => setFreshWalletCount(Number(event.target.value))}
+                            type='number'
+                            placeholder='3'
                             max={98}
-                            size='large'
                           />
                           <div 
                             className='absolute flex gap-1 sm:gap-2 right-[6%] top-[56%] md:top-[54%] cursor-pointer'
@@ -394,14 +394,14 @@ const Features = () => {
                               <div className='w-full md:w-1/2 flex flex-col md:flex-row gap-2'>
                                 <div className='w-full md:w-1/2 flex flex-col gap-1'>
                                   <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Buy Settings</p>
-                                  <InputNumber className="input_css p-3 w-full" min={1} />
+                                  <Input className="input_css p-3 w-full" type='number'/>
                                 </div>
                                 <div className='w-full md:w-1/2 flex flex-col gap-2'>
                                   <div className='w-full flex justify-between items-center'>
                                     <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Auto Set</p>
                                     <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Set Manually</p>
                                   </div>
-                                  <InputNumber className="input_css p-3 w-full" min={1} />
+                                  <Input className="input_css p-3 w-full" type='number' />
                                 </div>
                               </div>
                             </div>
@@ -412,13 +412,12 @@ const Features = () => {
                       <div className='w-full flex flex-col gap-2'>
                         <div className='relative w-full md:w-1/2 flex flex-col gap-2 md:pr-2'>
                           <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">How many wallets would you like to add to bundle?</p>
-                          <InputNumber 
+                          <Input 
                             className="input_css p-3 w-full" 
                             value={ownWalletCount}
-                            onChange={(value: number) => setOwnWalletCount(value)}
-                            min={1} 
+                            onChange={(event) => setOwnWalletCount(Number(event.target.value))}
+                            type='number'
                             max={98}
-                            size='large'
                           />
                           <div 
                             className='absolute flex gap-1 sm:gap-2 right-[6%] top-[56%] md:top-[54%] cursor-pointer'
@@ -456,14 +455,14 @@ const Features = () => {
                               <div className='w-full md:w-1/2 flex flex-col md:flex-row gap-2'>
                                 <div className='w-full md:w-1/2 flex flex-col gap-1'>
                                   <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Buy Settings</p>
-                                  <InputNumber className="input_css p-3 w-full" min={1} />
+                                  <Input className="input_css p-3 w-full" type='number' />
                                 </div>
                                 <div className='w-full md:w-1/2 flex flex-col gap-2'>
                                   <div className='w-full flex justify-between items-center'>
                                     <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Auto Set</p>
                                     <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Set Manually</p>
                                   </div>
-                                  <InputNumber className="input_css p-3 w-full" min={1} />
+                                  <Input className="input_css p-3 w-full" type='number' />
                                 </div>
                               </div>
                             </div>
@@ -501,9 +500,10 @@ const Features = () => {
                     </div>
                     <div className='w-full sm:w-1/2 flex flex-col gap-2'>
                       <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">ETH Amount</p>
-                      <InputNumber 
+                      <Input 
                         className="input_css p-3 w-full" 
-                        min={1} 
+                        type='number'
+                        placeholder='1'
                       />
                     </div>
                   </div>
@@ -512,8 +512,9 @@ const Features = () => {
                       <Input 
                         className="input_css !min-h-[74px] text-start sm:text-end pt-[30px] pl-[4.5%] sm:pr-[4%] p-3 w-full" 
                         type='number'
+                        placeholder='1,000,000,000'
                       />
-                      <p className='absolute sm:right-[5%] left-[5%] top-[20%] text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium'>Token</p>
+                      <p className='absolute left-[5%] sm:left-[unset] sm:right-[5%] w-max top-[20%] text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium'>Token</p>
                     </div>
                     <button 
                       className='absolute left-[calc(50%-24px)] z-10 w-12 h-12 rounded-full border-2 border-[rgba(226,232,240,1)] flex justify-center items-center bg-white'
@@ -525,6 +526,7 @@ const Features = () => {
                       <Input 
                         className="input_css !min-h-[74px] text-start pt-[30px] pl-[4.5%] p-3 w-full" 
                         type='number'
+                        placeholder='1.00'
                       />
                       <p className='absolute left-[5%] top-[20%] text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium'>ETH</p>
                     </div>
@@ -536,12 +538,14 @@ const Features = () => {
                     <div className='relative w-full'>
                       <Input 
                         className="input_css !min-h-[74px] text-start pt-[30px] pl-[4.5%] sm:pr-[4%] p-3 w-full" 
+                        placeholder='1.00 ETH (~2,414.47 USD)'
                       />
                       <p className='absolute left-[5%] top-[18%] text-[rgba(2,8,23,1)] text-xs md:text-base font-medium'>Launch Market Cap</p>
                     </div>
                     <div className='relative w-full'>
                       <Input 
                         className="input_css !min-h-[74px] text-start pt-[30px] pl-[4.5%] p-3 w-full" 
+                        placeholder='0.00000 ETH (~0.00 USD)'
                       />
                       <p className='absolute left-[5%] top-[18%] text-[rgba(2,8,23,1)] text-xs md:text-base font-medium'>Launch Token Price</p>
                     </div>

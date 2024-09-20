@@ -60,3 +60,15 @@
 .dashboard_selector .ant-segmented-item {
   width: 50%;
 }
+
+.homeCSS {
+  background-image: url("/images/bohedz.svg");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: center;
+}
+
+.fixed_background {
+  background-image: url("/images/bohedz.svg");
+  background-size: cover;
+}

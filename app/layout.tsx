@@ -19,7 +19,7 @@ export default function RootLayout({
       */}
       <head />
 
-      <body className="dark:bg-black">
+      <body className="">
         <ConfigProvider 
           theme={{
             components: {
@@ -34,6 +34,7 @@ export default function RootLayout({
             }
           }}
         >
+          <div className="w-screen h-screen top-0 left-0 -z-10 fixed_background fixed" />
           <Header />
           {children}
           <Footer />
