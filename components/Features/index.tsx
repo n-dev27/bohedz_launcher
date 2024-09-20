@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Slider, Input, InputNumber, Select, Switch, Segmented } from "antd";
 import { FaPlus } from "react-icons/fa6";
+import { GoEye, GoEyeClosed } from "react-icons/go";
 
 // Define a type for the network options
 type NetworkOption = {
@@ -47,7 +48,9 @@ const Features = () => {
   const [walletFees, setWalletFees] = useState<{ buy: number; sell: number }[]>([]); // New state for wallet fees
   const [burnFee, setBurnFee] = useState<{buy: number; sell: number}>({ buy: 0, sell: 0 });
   const [walletTab, setWalletTab] = useState<string>(walletTabOption[0].value);
-  const [walletCount, setWalletCount] = useState<number>(0);
+  const [freshWalletCount, setFreshWalletCount] = useState<number>(0);
+  const [ownWalletCount, setOwnWalletCount] = useState<number>(0);
+  const [viewPKList, setViewPKList] = useState<boolean[]>([]); // New state for view PK
 
   const handleNetworkChange = (value: string) => {
     setSelectNetworkValue(value);
@@ -341,46 +344,123 @@ const Features = () => {
                           <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">How many wallets would you like to add to bundle?</p>
                           <InputNumber 
                             className="input_css p-3 w-full" 
-                            value={walletCount}
-                            onChange={(value: number) => setWalletCount(value)}
+                            value={freshWalletCount}
+                            onChange={(value: number) => setFreshWalletCount(value)}
                             min={1} 
                             max={98}
                             size='large'
                           />
                           <div 
-                            className='absolute flex gap-1 sm:gap-2 right-[8%] top-[56%] md:top-[53%] cursor-pointer'
-                            onClick={() => setWalletCount(98)}
+                            className='absolute flex gap-1 sm:gap-2 right-[6%] top-[56%] md:top-[54%] cursor-pointer'
+                            onClick={() => setFreshWalletCount(98)}
                           >
                             <span className="text-[0.7rem] sm:text-sm font-bold">Max</span>
                             <span className='text-[0.7rem] sm:text-sm'>98</span>
                           </div>
                         </div>
-                        <div className='w-full flex flex-col md:flex-row gap-4'>
-                          <div className='w-full md:w-1/2 flex flex-col gap-1'>
-                            <div className='w-full flex justify-between items-center'>
-                              <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Wallet 1:</p>
-                              <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-bold">Export All PKs</p>
-                            </div>
-                            <Input className="input_css p-3" placeholder="0x83792HSL28m12499SKJSD9300n12"/>
-                          </div>
-                          <div className='w-full md:w-1/2 flex flex-col md:flex-row gap-2'>
-                            <div className='w-full md:w-1/2 flex flex-col gap-1'>
-                              <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Buy Settings</p>
-                              <InputNumber className="input_css p-3 w-full" min={1} />
-                            </div>
-                            <div className='w-full md:w-1/2 flex flex-col gap-2'>
-                              <div className='w-full flex justify-between items-center'>
-                                <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Auto Set</p>
-                                <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Set Manually</p>
+                        <div className='w-full flex flex-col gap-2'>
+                          {Array.from({ length: freshWalletCount }).map((_, index) => ( // Dynamically create wallet input fields
+                            <div className='w-full flex flex-col md:flex-row gap-1 md:gap-4'>
+                              <div key={index} className='relative w-full md:w-1/2 flex flex-col gap-1'>
+                                {index === 0 && <p className="absolute right-0 text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-bold cursor-pointer">Export All PKs</p>}
+                                <div className='w-full flex justify-start items-center'>
+                                  <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Wallet {index + 1}:</p>
+                                </div>
+                                <div className='relative'>
+                                  <Input 
+                                    className="input_css p-3" 
+                                    placeholder="0x83792HSL28m12499SKJSD9300n12" 
+                                    type={viewPKList[index] ? 'text' : 'password'}
+                                  />
+                                  <div className='absolute right-[2%] top-[35%] cursor-pointer' onClick={() => {
+                                    setViewPKList(prev => {
+                                      const newList = [...prev];
+                                      newList[index] = !newList[index]; // Toggle visibility
+                                      return newList;
+                                    });
+                                  }}>
+                                    {viewPKList[index] ? <GoEyeClosed /> : <GoEye />}
+                                  </div>
+                                </div>
                               </div>
-                              <InputNumber className="input_css p-3 w-full" min={1} />
+                              <div className='w-full md:w-1/2 flex flex-col md:flex-row gap-2'>
+                                <div className='w-full md:w-1/2 flex flex-col gap-1'>
+                                  <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Buy Settings</p>
+                                  <InputNumber className="input_css p-3 w-full" min={1} />
+                                </div>
+                                <div className='w-full md:w-1/2 flex flex-col gap-2'>
+                                  <div className='w-full flex justify-between items-center'>
+                                    <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Auto Set</p>
+                                    <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Set Manually</p>
+                                  </div>
+                                  <InputNumber className="input_css p-3 w-full" min={1} />
+                                </div>
+                              </div>
                             </div>
-                          </div>
+                          ))}
                         </div>
                       </div>
                     ) : (
-                      <div className='w-full flex flex-col'>
-                
+                      <div className='w-full flex flex-col gap-2'>
+                        <div className='relative w-full md:w-1/2 flex flex-col gap-2 md:pr-2'>
+                          <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">How many wallets would you like to add to bundle?</p>
+                          <InputNumber 
+                            className="input_css p-3 w-full" 
+                            value={ownWalletCount}
+                            onChange={(value: number) => setOwnWalletCount(value)}
+                            min={1} 
+                            max={98}
+                            size='large'
+                          />
+                          <div 
+                            className='absolute flex gap-1 sm:gap-2 right-[6%] top-[56%] md:top-[54%] cursor-pointer'
+                            onClick={() => setOwnWalletCount(98)}
+                          >
+                            <span className="text-[0.7rem] sm:text-sm font-bold">Max</span>
+                            <span className='text-[0.7rem] sm:text-sm'>98</span>
+                          </div>
+                        </div>
+                        <div className='w-full flex flex-col gap-2'>
+                          {Array.from({ length: ownWalletCount }).map((_, index) => ( // Dynamically create wallet input fields
+                            <div className='w-full flex flex-col md:flex-row gap-1 md:gap-4'>
+                              <div key={index} className='relative w-full md:w-1/2 flex flex-col gap-1'>
+                                {index === 0 && <p className="absolute right-0 text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-bold cursor-pointer">Import PKs</p>}
+                                <div className='w-full flex justify-start items-center'>
+                                  <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Wallet {index + 1}:</p>
+                                </div>
+                                <div className='relative'>
+                                  <Input 
+                                    className="input_css p-3" 
+                                    placeholder="0x83792HSL28m12499SKJSD9300n12" 
+                                    type={viewPKList[index] ? 'text' : 'password'}
+                                  />
+                                  <div className='absolute right-[2%] top-[35%] cursor-pointer' onClick={() => {
+                                    setViewPKList(prev => {
+                                      const newList = [...prev];
+                                      newList[index] = !newList[index]; // Toggle visibility
+                                      return newList;
+                                    });
+                                  }}>
+                                    {viewPKList[index] ? <GoEyeClosed /> : <GoEye />}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className='w-full md:w-1/2 flex flex-col md:flex-row gap-2'>
+                                <div className='w-full md:w-1/2 flex flex-col gap-1'>
+                                  <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Buy Settings</p>
+                                  <InputNumber className="input_css p-3 w-full" min={1} />
+                                </div>
+                                <div className='w-full md:w-1/2 flex flex-col gap-2'>
+                                  <div className='w-full flex justify-between items-center'>
+                                    <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Auto Set</p>
+                                    <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Set Manually</p>
+                                  </div>
+                                  <InputNumber className="input_css p-3 w-full" min={1} />
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
