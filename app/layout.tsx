@@ -34,7 +34,7 @@ export default function RootLayout({
             }
           }}
         >
-          {/* <div className="w-screen h-screen top-0 left-0 -z-10 fixed_background fixed" /> */}
+          <div className="w-screen h-screen top-0 left-0 -z-10 fixed_background fixed" />
           <Header />
           {children}
           <Footer />
