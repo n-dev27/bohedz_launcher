@@ -88,8 +88,7 @@ const Header = () => {
               <ul className="hidden xl:flex justify-center gap-10 w-full">
                 {menuData.map((menuItem, index) => (
                   <li key={menuItem.id} className="!m-0">
-                    <Link
-                      href={menuItem.path}
+                    <button
                       className={`flex justify-center text-center gap-2 py-2 text-sm text-[rgba(2,8,23,1)] hover:opacity-70 xl:mr-0 xl:inline-flex xl:py-6 xl:px-0`}
                     >
                       <Image
@@ -99,7 +98,7 @@ const Header = () => {
                         height={24}
                       />
                       <p className="flex justify-center items-center font-medium text-[rgba(2,8,23,1)] text-sm">{menuItem.title}</p>
-                    </Link>
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -114,8 +113,7 @@ const Header = () => {
                 <ul className="block xl:hidden xl:space-x-12">
                   {menuData.map((menuItem, index) => (
                     <li key={menuItem.id} className="group relative">
-                      <Link
-                        href={menuItem.path}
+                      <button
                         className={`flex justify-start text-center gap-2 py-2 text-sm text-[rgba(2,8,23,1)] group-hover:opacity-70 xl:mr-0 xl:inline-flex xl:py-6 xl:px-0`}
                       >
                         <Image
@@ -125,7 +123,7 @@ const Header = () => {
                           height={24}
                         />
                         <p className="flex justify-start items-center font-medium text-[rgba(2,8,23,1)] text-sm">{menuItem.title}</p>
-                      </Link>
+                      </button>
                     </li>
                   ))}
                 </ul>
