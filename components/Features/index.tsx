@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { UploadOutlined } from '@ant-design/icons';
 import { Slider, Input, Button, message, Upload, Select, Switch, Segmented } from "antd";
 import { FaPlus } from "react-icons/fa6";
@@ -83,6 +83,8 @@ const Features = () => {
     }));
   }
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const handleMarketingFee1 = (value: number, type: 'buy' | 'sell', index: number) => {
     const updatedFees = [...marketingFee1];
     if (!updatedFees[index]) {
@@ -130,6 +132,26 @@ const Features = () => {
       ...prev,
       [type]: value // Set the value for the specified type
     }));
+  }
+
+  const handleCSVChange = (e) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target?.result as string;
+      const lines = content.split('\n'); // Split content into lines
+      const walletsAndKeys = lines.slice(1).map(line => line.split('\t')); // Get wallet and key pairs
+
+      // Create an array of objects for wallets and private keys
+      const data = walletsAndKeys.map(([wallet, privateKey]) => ({
+        wallet,
+        privateKey,
+      }));
+
+      setOwnWalletCount(data);
+      console.log('Data:', data); // Log the array of wallet and private key objects
+      // You can now set this data to state or process it further as needed
+    };
+    reader.readAsText(e.target.files[0]); // Read the file as text
   }
 
   return (
@@ -559,7 +581,7 @@ const Features = () => {
                         <div className='w-full flex flex-col gap-2'>
                           <div className='relative w-full md:w-1/2 flex flex-col gap-2 md:pr-2'>
                             <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Upload csv with wallets and PKs</p>
-                            <Upload 
+                            {/* <Upload 
                               accept=".csv" // Restrict to CSV files
                               beforeUpload={(file) => {
                                 const isCSV = file.type === 'text/csv'; // Check if the file is a CSV
@@ -592,14 +614,15 @@ const Features = () => {
                                   message.error('File upload failed. Please try again.'); // Handle upload error
                                 }
                               }}
-                            >
-                              <Button icon={<UploadOutlined />}>Click to Upload</Button>
-                            </Upload>
+                            > */}
+                            <input type="file" id="csv-upload" accept='.csv' onChange={handleCSVChange} ref={fileInputRef} className='hidden' />
+                            <Button icon={<UploadOutlined />} onClick={() => fileInputRef?.current.click()}>Click to Upload</Button>
+                            {/* </Upload> */}
                           </div>
                           <div className='w-full flex flex-col gap-2'>
                             {Array.from({ length: ownWalletCount.length }).map((_, index) => ( // Dynamically create wallet input fields
-                              <div className='w-full flex flex-col md:flex-row gap-1 md:gap-4'>
-                                <div key={index} className='relative w-full md:w-1/2 flex flex-col gap-4'>
+                              <div key={index} className='w-full flex flex-col md:flex-row gap-1 md:gap-4'>
+                                <div className='relative w-full md:w-1/2 flex flex-col gap-4'>
                                   {index === 0 && <p className="absolute right-0 text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-bold cursor-pointer">Import PKs</p>}
                                   <div className='w-full flex justify-start items-center'>
                                     <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Wallet {index + 1}:</p>
