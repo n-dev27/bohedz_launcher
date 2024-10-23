@@ -566,7 +566,7 @@ const Features = () => {
                                 if (!isCSV) {
                                   message.error('You can only upload CSV files!'); // Show error message
                                 }
-                                return isCSV; // Prevent upload if not CSV
+                                return false; // Prevent upload if not CSV
                               }}
                               onChange={(info) => {
                                 if (info.file.status === 'done') {
