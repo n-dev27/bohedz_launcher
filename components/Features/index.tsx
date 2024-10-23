@@ -588,6 +588,8 @@ const Features = () => {
                                     // You can now set this data to state or process it further as needed
                                   };
                                   reader.readAsText(info.file.originFileObj); // Read the file as text
+                                } else if (info.file.status === 'error') {
+                                  message.error('File upload failed. Please try again.'); // Handle upload error
                                 }
                               }}
                             >
