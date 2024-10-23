@@ -1,6 +1,7 @@
 'use client'
 import React, { useState } from 'react';
-import { Slider, Input, InputNumber, Select, Switch, Segmented } from "antd";
+import { UploadOutlined } from '@ant-design/icons';
+import { Slider, Input, Button, message, Upload, Select, Switch, Segmented } from "antd";
 import { FaPlus } from "react-icons/fa6";
 import { GoEye, GoEyeClosed } from "react-icons/go";
 
@@ -46,17 +47,26 @@ const liqTabOption: TabsProps[] = [
 const Features = () => {
 
   const [selectNetworkValue, setSelectNetworkValue] = useState<string>(networkOptions[0].value);
-  const [selectExchange, setSelectExchange] = useState<string>(exchangeOption[0].value);
   const [selectExchangeDex, setSelectExchangeDex] = useState<string>(exchangeOption[0].value);
   const [liquidFee, setLiquidFee] = useState<{buy: number; sell: number}>({ buy: 0, sell: 0 });
-  const [marketingFee, setMarketingFee] = useState<{buy: number; sell: number}>({ buy: 0, sell: 0 });
-  const [taxWallets, setTaxWallets] = useState<string[]>([]); // New state for wallets
-  const [walletFees, setWalletFees] = useState<{ buy: number; sell: number }[]>([]); // New state for wallet fees
+  const [decimals, setDecimals] = useState<number>(18);
+  const [decimalsFlag, setDecimalsFlag] = useState<boolean>(false);
+  const [maxWalletLimitFlag, setMaxWalletLimitFlag] = useState<boolean>(false);
+  const [maxWalletLimit, setMaxWalletLimit] = useState<number>(0.25);
+  const [maxTxLimitFlag, setMaxTxLimitFlag] = useState<boolean>(false);
+  const [maxTxLimit, setMaxTxLimit] = useState<number>(0.25);
+  const [marketingFee1, setMarketingFee1] = useState<{buy: number; sell: number}[]>([{ buy: 0, sell: 0 }]);
+  const [marketingFee2, setMarketingFee2] = useState<{buy: number; sell: number}>({ buy: 0, sell: 0 });
+  const [taxWallets1, setTaxWallets1] = useState<string[]>([]); // New state for Launch Phase
+  const [launchPhaseCount, setLaunchPhaseCount] = useState<number>(0);
+  const [taxWallets2, setTaxWallets2] = useState<string[]>([]); // New state for Post Launch Phase
+  const [walletFees1, setWalletFees1] = useState<{ buy: number; sell: number }[]>([]); // New state for wallet fees
+  const [walletFees2, setWalletFees2] = useState<{ buy: number; sell: number }[]>([]); // New state for wallet fees
   const [burnFee, setBurnFee] = useState<{buy: number; sell: number}>({ buy: 0, sell: 0 });
   const [walletTab, setWalletTab] = useState<string>(walletTabOption[0].value);
   const [liqTab, setLiqTab] = useState<string>(liqTabOption[0].value);
   const [freshWalletCount, setFreshWalletCount] = useState<number>(0);
-  const [ownWalletCount, setOwnWalletCount] = useState<number>(0);
+  const [ownWalletCount, setOwnWalletCount] = useState<{wallet: string, privateKey: string}[]>([]);
   const [viewPKList, setViewPKList] = useState<boolean[]>([]); // New state for view PK
   const [totalSupply, setTotalSupply] = useState<number>(0);
   const [bundleFlag, setBundleFlag] = useState<boolean>(false);
@@ -66,10 +76,6 @@ const Features = () => {
     setSelectNetworkValue(value);
   }
 
-  const handleExchangeChange = (value: string) => {
-    setSelectExchange(value);
-  }
-
   const handleLiquidFee = (value: number, type: 'buy' | 'sell') => {
     setLiquidFee(prev => ({
       ...prev,
@@ -77,24 +83,46 @@ const Features = () => {
     }));
   }
 
-  const handleMarketingFee = (value: number, type: 'buy' | 'sell') => {
-    setMarketingFee(prev => ({
+  const handleMarketingFee1 = (value: number, type: 'buy' | 'sell', index: number) => {
+    const updatedFees = [...marketingFee1];
+    if (!updatedFees[index]) {
+        updatedFees[index] = { buy: 0, sell: 0 }; // Initialize if not present
+    }
+    updatedFees[index][type] = value;
+    setMarketingFee1(updatedFees);
+  }
+
+  const handleMarketingFee2 = (value: number, type: 'buy' | 'sell') => {
+    setMarketingFee2(prev => ({
       ...prev,
       [type]: value // Set the value for the specified type
     }));
   }
 
-  const handleAddTaxWallet = () => {
-    setTaxWallets([...taxWallets, ""]); // Add a new empty wallet entry
+  const handleAddTaxWallet1 = () => {
+    setTaxWallets1([...taxWallets1, ""]); // Add a new empty wallet entry
   }
 
-  const handleWalletFeeChange = (index: number, type: 'buy' | 'sell', value: number) => {
-    const updatedFees = [...walletFees];
+  const handleAddTaxWallet2 = () => {
+    setTaxWallets2([...taxWallets2, ""]); // Add a new empty wallet entry
+  }
+
+  const handleWalletFeeChange1 = (index: number, type: 'buy' | 'sell', value: number) => {
+    const updatedFees = [...walletFees1];
     if (!updatedFees[index]) {
         updatedFees[index] = { buy: 0, sell: 0 }; // Initialize if not present
     }
     updatedFees[index][type] = value;
-    setWalletFees(updatedFees);
+    setWalletFees1(updatedFees);
+  }
+
+  const handleWalletFeeChange2 = (index: number, type: 'buy' | 'sell', value: number) => {
+    const updatedFees = [...walletFees2];
+    if (!updatedFees[index]) {
+        updatedFees[index] = { buy: 0, sell: 0 }; // Initialize if not present
+    }
+    updatedFees[index][type] = value;
+    setWalletFees2(updatedFees);
   }
 
   const handleBurnFee = (value: number, type: 'buy' | 'sell') => {
@@ -141,8 +169,14 @@ const Features = () => {
                     <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Custom Decimals</p>
                     <p className="text-[rgba(100,116,139,1)] text-[0.7rem] md:text-sm font-normal">Change the number of decimals for your token.</p>
                   </div>
-                  <Switch className="bg-[#E2E8F0]"/>
+                  <Switch className="bg-[#E2E8F0]" value={decimalsFlag} onChange={(value: boolean) => setDecimalsFlag(value)} />
                 </div>
+                {decimalsFlag && (
+                  <div className='inline-flex items-center gap-20 px-4 pb-4'>
+                    <Slider className='flex-1' value={decimals} max={18} onChange={(value: number) => setDecimals(value)}/>
+                    <p className="text-[rgba(2,8,23,1)] text-xs md:text-base font-normal">{decimals}</p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -153,15 +187,34 @@ const Features = () => {
                   <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Enable Max Wallet Limit</p>
                   <p className="text-[rgba(100,116,139,1)] text-[0.7rem] md:text-sm font-normal">Limits the maximum number of tokens that can be held by a single wallet.</p>
                 </div>
-                <Switch className="bg-[#E2E8F0]"/>
+                <Switch className="bg-[#E2E8F0]" value={maxWalletLimitFlag} onChange={(value: boolean) => setMaxWalletLimitFlag(value)} />
               </div>
+              {maxWalletLimitFlag && (
+                <div className='inline-flex items-center gap-10'>
+                  <Slider className='flex-1' value={maxWalletLimit} min={0.25} max={2} step={0.1} onChange={(value: number) => setMaxWalletLimit(value)}/>
+                  <p className="text-[rgba(2,8,23,1)] text-xs md:text-base font-normal">{maxWalletLimit}</p>
+                </div>
+              )}
               <div className="w-full flex justify-between items-center gap-4 md:gap-0">
                 <div className="flex flex-col gap-1">
                   <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Enable Max Transaction Limit</p>
                   <p className="text-[rgba(100,116,139,1)] text-[0.7rem] md:text-sm font-normal">Limits the maximum number of tokens that can be transferred in a single transaction.</p>
                 </div>
-                <Switch className="bg-[#E2E8F0]"/>
+                <Switch className="bg-[#E2E8F0]" value={maxTxLimitFlag} onChange={(value: boolean) => setMaxTxLimitFlag(value)} />
               </div>
+              {maxTxLimitFlag && (
+                <div className='inline-flex items-center gap-10'>
+                  <Slider className='flex-1' value={maxTxLimit} min={0.25} max={2} step={0.1} onChange={(value: number) => {
+                    // Ensure max transaction limit does not exceed max wallet limit
+                    if (value > maxWalletLimit) {
+                      setMaxTxLimit(maxWalletLimit); // Set to max wallet limit if exceeded
+                    } else {
+                      setMaxTxLimit(value);
+                    }
+                  }}/>
+                  <p className="text-[rgba(2,8,23,1)] text-xs md:text-base font-normal">{maxTxLimit}</p>
+                </div>
+              )}
               <div className="w-full flex justify-between items-center gap-4 md:gap-0">
                 <div className="flex flex-col gap-1">
                   <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Enable Blacklist</p>
@@ -204,64 +257,71 @@ const Features = () => {
                   <div className='w-full sm:w-1/2 flex flex-col gap-2'>
                     <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Liquidity Fee (Buy)</p>
                     <div className='inline-flex items-center gap-4'>
-                      <Slider className='flex-1' value={liquidFee?.buy} onChange={(value: number) => handleLiquidFee(value, 'buy')}/>
+                      <Slider className='flex-1' value={liquidFee?.buy} max={10} onChange={(value: number) => handleLiquidFee(value, 'buy')}/>
                       <p className="text-[rgba(2,8,23,1)] text-xs md:text-base font-normal">{liquidFee?.buy}%</p>
                     </div>
                   </div>
                   <div className='w-full sm:w-1/2 flex flex-col gap-2'>
                     <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Liquidity Fee (Sell)</p>
                     <div className='inline-flex items-center gap-4'>
-                      <Slider className='flex-1' value={liquidFee?.sell} onChange={(value: number) => handleLiquidFee(value, 'sell')}/>
+                      <Slider className='flex-1' value={liquidFee?.sell} max={10} onChange={(value: number) => handleLiquidFee(value, 'sell')}/>
                       <p className="text-[rgba(2,8,23,1)] text-xs md:text-base font-normal">{liquidFee?.sell}%</p>
                     </div>
                   </div>
                 </div>
-                <div className='flex flex-col gap-2'>
-                  <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Exchange</p>
-                  <Select 
-                    className='w-full h-12'
-                    value={selectExchange}
-                    onChange={handleExchangeChange}
-                    options={exchangeOption}
-                  />
-                </div>
               </div>
               <div className='flex flex-col gap-4 p-4 border-b-[1px] border-[rgba(226,232,240,1)]'>
-                <div className='flex flex-col gap-1'>
-                  <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Marketing/Operations Fee</p>
-                  <p className="text-[rgba(100,116,139,1)] text-[0.7rem] md:text-sm font-normal">The percentage of the transaction that will be sent to wallet set here. Maximum of 10%.</p>
-                </div>
-                <div className='w-full flex flex-col sm:flex-row gap-4 sm:gap-10'>
-                  <div className='w-full sm:w-1/2 flex flex-col gap-2'>
-                    <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Marketing/Operations Fee (Buy)</p>
-                    <div className='inline-flex items-center gap-4'>
-                      <Slider className='flex-1' value={marketingFee?.buy} onChange={(value: number) => handleMarketingFee(value, 'buy')}/>
-                      <p className="text-[rgba(2,8,23,1)] text-xs md:text-base font-normal">{marketingFee?.buy}%</p>
-                    </div>
+                <div className='w-full flex gap-4 items-center'>
+                  <div className='flex flex-col gap-1 w-full md:w-1/2'>
+                    <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Launch Phase</p>
+                    <p className="text-[rgba(100,116,139,1)] text-[0.7rem] md:text-sm font-normal">The percentage of the transaction that will be sent to wallet set here. Maximum of 10%.</p>
                   </div>
-                  <div className='w-full sm:w-1/2 flex flex-col gap-2'>
-                    <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Marketing/Operations Fee (Sell)</p>
-                    <div className='inline-flex items-center gap-4'>
-                      <Slider className='flex-1' value={marketingFee?.sell} onChange={(value: number) => handleMarketingFee(value, 'sell')}/>
-                      <p className="text-[rgba(2,8,23,1)] text-xs md:text-base font-normal">{marketingFee?.sell}%</p>
-                    </div>
-                  </div>
-                </div>
-                <div className='flex flex-col gap-2'>
-                  <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Marketing/Operations Wallet</p>
-                  <div className='w-full inline-flex gap-10 md:gap-40 items-center'>
-                    <Input className="input_css p-3 flex-1" placeholder="0x0000000000000000000000000000000000000000" />
-                    <button 
-                      className='w-8 h-8 md:w-12 md:h-12 rounded-full border-2 border-[rgba(226,232,240,1)] flex justify-center items-center bg-white'
-                      onClick={() => handleAddTaxWallet()}
+                  <div className='relative w-full md:w-1/2 flex flex-col gap-2 md:pr-2'>
+                    <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">How many launch phase would you like to add?</p>
+                    <Input 
+                      className="input_css p-3 w-full" 
+                      value={launchPhaseCount}
+                      onChange={(event) => setLaunchPhaseCount(Number(event.target.value))}
+                      type='number'
+                      max={10}
+                    />
+                    <div 
+                      className='absolute flex gap-1 sm:gap-2 right-[6%] top-[56%] md:top-[54%] cursor-pointer'
+                      onClick={() => setLaunchPhaseCount(10)}
                     >
-                      <FaPlus className='text-[rgba(38,99,235,1)] w-6 h-6 md:w-10 md:h-10'/>
-                    </button>
+                      <span className="text-[0.7rem] sm:text-sm font-bold">Max</span>
+                      <span className='text-[0.7rem] sm:text-sm'>10</span>
+                    </div>
                   </div>
                 </div>
+
+                {Array.from({ length: launchPhaseCount }).map((_, index) => (
+                  <div key={index} className='w-full gap-4 flex flex-col'>
+                    <div className='w-full flex flex-col sm:flex-row gap-4 sm:gap-10'>
+                      <div className='w-full sm:w-1/2 flex flex-col gap-2'>
+                        <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Launch Phase (Buy)</p>
+                        <div className='inline-flex items-center gap-4'>
+                          <Slider className='flex-1' value={marketingFee1[index]?.buy || 0} max={10} onChange={(value: number) => handleMarketingFee1(value, 'buy', index)}/>
+                          <p className="text-[rgba(2,8,23,1)] text-xs md:text-base font-normal">{marketingFee1[index]?.buy || 0}%</p>
+                        </div>
+                      </div>
+                      <div className='w-full sm:w-1/2 flex flex-col gap-2'>
+                        <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Launch Phase (Sell)</p>
+                        <div className='inline-flex items-center gap-4'>
+                          <Slider className='flex-1' value={marketingFee1[index]?.sell || 0} max={10} onChange={(value: number) => handleMarketingFee1(value, 'sell', index)}/>
+                          <p className="text-[rgba(2,8,23,1)] text-xs md:text-base font-normal">{marketingFee1[index]?.sell || 0}%</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className='flex flex-col gap-2'>
+                      <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Marketing/Operations Wallet</p>
+                      <Input className="input_css p-3 flex-1" placeholder="0x0000000000000000000000000000000000000000" />
+                    </div>
+                  </div>
+                ))}
               </div>
               
-              {taxWallets.map((wallet, index) => ( // Map over wallets to render each section
+              {taxWallets1.map((wallet, index) => ( // Map over wallets to render each section
                 <div key={index} className='w-full flex p-4 border-b-[1px] border-[rgba(226,232,240,1)]'>
                     <div className='w-full flex flex-col gap-4'>
                       <div className='flex flex-col gap-1'>
@@ -271,17 +331,17 @@ const Features = () => {
 
                       <div className='w-full flex flex-col sm:flex-row gap-4 sm:gap-10'>
                         <div className='w-full sm:w-1/2 flex flex-col gap-2'>
-                          <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Marketing/Operations Fee (Buy)</p>
+                          <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Launch Phase (Buy)</p>
                           <div className='inline-flex items-center gap-4'>
-                            <Slider className='flex-1' value={walletFees[index]?.buy || 0} onChange={(value: number) => handleWalletFeeChange(index, 'buy', value)}/>
-                            <p className="text-[rgba(2,8,23,1)] text-xs md:text-base font-normal">{walletFees[index]?.buy || 0}%</p>
+                            <Slider className='flex-1' value={walletFees1[index]?.buy || 0} max={10} onChange={(value: number) => handleWalletFeeChange1(index, 'buy', value)}/>
+                            <p className="text-[rgba(2,8,23,1)] text-xs md:text-base font-normal">{walletFees1[index]?.buy || 0}%</p>
                           </div>
                         </div>
                         <div className='w-full sm:w-1/2 flex flex-col gap-2'>
-                          <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Marketing/Operations Fee (Sell)</p>
+                          <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Launch Phase (Sell)</p>
                           <div className='inline-flex items-center gap-4'>
-                            <Slider className='flex-1' value={walletFees[index]?.sell || 0} onChange={(value: number) => handleWalletFeeChange(index, 'sell', value)}/>
-                            <p className="text-[rgba(2,8,23,1)] text-xs md:text-base font-normal">{walletFees[index]?.sell || 0}%</p>
+                            <Slider className='flex-1' value={walletFees1[index]?.sell || 0} max={10} onChange={(value: number) => handleWalletFeeChange1(index, 'sell', value)}/>
+                            <p className="text-[rgba(2,8,23,1)] text-xs md:text-base font-normal">{walletFees1[index]?.sell || 0}%</p>
                           </div>
                         </div>
                       </div>  
@@ -293,7 +353,83 @@ const Features = () => {
                         </div>
                         <button 
                             className='w-8 md:w-12 h-8 md:h-12 rounded-full border-2 border-[rgba(226,232,240,1)] flex justify-center items-center bg-white'
-                            onClick={() => handleAddTaxWallet()}
+                            onClick={() => handleAddTaxWallet1()}
+                        >
+                            <FaPlus className='text-[rgba(38,99,235,1)] w-6 h-6 md:w-10 md:h-10'/>
+                        </button>
+                      </div>
+                    </div>
+                </div>
+              ))}
+
+              <div className='flex flex-col gap-4 p-4 border-b-[1px] border-[rgba(226,232,240,1)]'>
+                <div className='flex flex-col gap-1'>
+                  <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Post Launch Phase</p>
+                  <p className="text-[rgba(100,116,139,1)] text-[0.7rem] md:text-sm font-normal">The percentage of the transaction that will be sent to wallet set here. Maximum of 10%.</p>
+                </div>
+                <div className='w-full flex flex-col sm:flex-row gap-4 sm:gap-10'>
+                  <div className='w-full sm:w-1/2 flex flex-col gap-2'>
+                    <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Post Launch Phase (Buy)</p>
+                    <div className='inline-flex items-center gap-4'>
+                      <Slider className='flex-1' value={marketingFee2?.buy} max={10} onChange={(value: number) => handleMarketingFee2(value, 'buy')}/>
+                      <p className="text-[rgba(2,8,23,1)] text-xs md:text-base font-normal">{marketingFee2?.buy}%</p>
+                    </div>
+                  </div>
+                  <div className='w-full sm:w-1/2 flex flex-col gap-2'>
+                    <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Post Launch Phase (Sell)</p>
+                    <div className='inline-flex items-center gap-4'>
+                      <Slider className='flex-1' value={marketingFee2?.sell} max={10} onChange={(value: number) => handleMarketingFee2(value, 'sell')}/>
+                      <p className="text-[rgba(2,8,23,1)] text-xs md:text-base font-normal">{marketingFee2?.sell}%</p>
+                    </div>
+                  </div>
+                </div>
+                <div className='flex flex-col gap-2'>
+                  <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Marketing/Operations Wallet</p>
+                  <div className='w-full inline-flex gap-10 md:gap-40 items-center'>
+                    <Input className="input_css p-3 flex-1" placeholder="0x0000000000000000000000000000000000000000" />
+                    <button 
+                      className='w-8 h-8 md:w-12 md:h-12 rounded-full border-2 border-[rgba(226,232,240,1)] flex justify-center items-center bg-white'
+                      onClick={() => handleAddTaxWallet2()}
+                    >
+                      <FaPlus className='text-[rgba(38,99,235,1)] w-6 h-6 md:w-10 md:h-10'/>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              {taxWallets2.map((wallet, index) => ( // Map over wallets to render each section
+                <div key={index} className='w-full flex p-4 border-b-[1px] border-[rgba(226,232,240,1)]'>
+                    <div className='w-full flex flex-col gap-4'>
+                      <div className='flex flex-col gap-1'>
+                        <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">New Tax Wallet</p>
+                        <p className="text-[rgba(100,116,139,1)] text-[0.7rem] md:text-sm font-normal">The percentage of the transaction that will be sent to wallet set here. Maximum of 10%.</p>
+                      </div>
+
+                      <div className='w-full flex flex-col sm:flex-row gap-4 sm:gap-10'>
+                        <div className='w-full sm:w-1/2 flex flex-col gap-2'>
+                          <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Post Launch Phase (Buy)</p>
+                          <div className='inline-flex items-center gap-4'>
+                            <Slider className='flex-1' value={walletFees2[index]?.buy || 0} max={10} onChange={(value: number) => handleWalletFeeChange2(index, 'buy', value)}/>
+                            <p className="text-[rgba(2,8,23,1)] text-xs md:text-base font-normal">{walletFees2[index]?.buy || 0}%</p>
+                          </div>
+                        </div>
+                        <div className='w-full sm:w-1/2 flex flex-col gap-2'>
+                          <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Post Launch Phase (Sell)</p>
+                          <div className='inline-flex items-center gap-4'>
+                            <Slider className='flex-1' value={walletFees2[index]?.sell || 0} max={10} onChange={(value: number) => handleWalletFeeChange2(index, 'sell', value)}/>
+                            <p className="text-[rgba(2,8,23,1)] text-xs md:text-base font-normal">{walletFees2[index]?.sell || 0}%</p>
+                          </div>
+                        </div>
+                      </div>  
+
+                      <div className='w-full inline-flex gap-4 md:gap-10 items-center'>
+                        <div className='flex-1 flex flex-col sm:flex-row gap-4'>
+                          <Input className="w-full sm:w-1/3 input_css p-3" placeholder="Enter New Tax Wallet Name" />
+                          <Input className="w-full sm:w-2/3 input_css p-3" placeholder="0x0000000000000000000000000000000000000000" />
+                        </div>
+                        <button 
+                            className='w-8 md:w-12 h-8 md:h-12 rounded-full border-2 border-[rgba(226,232,240,1)] flex justify-center items-center bg-white'
+                            onClick={() => handleAddTaxWallet2()}
                         >
                             <FaPlus className='text-[rgba(38,99,235,1)] w-6 h-6 md:w-10 md:h-10'/>
                         </button>
@@ -311,14 +447,14 @@ const Features = () => {
                   <div className='w-full sm:w-1/2 flex flex-col gap-2'>
                     <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Burn Fee (Buy)</p>
                     <div className='inline-flex items-center gap-4'>
-                      <Slider className='flex-1' value={burnFee?.buy} onChange={(value: number) => handleBurnFee(value, 'buy')}/>
+                      <Slider className='flex-1' value={burnFee?.buy} max={10} onChange={(value: number) => handleBurnFee(value, 'buy')}/>
                       <p className="text-[rgba(2,8,23,1)] text-xs md:text-base font-normal">{burnFee?.buy}%</p>
                     </div>
                   </div>
                   <div className='w-full sm:w-1/2 flex flex-col gap-2'>
                     <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Burn Fee (Sell)</p>
                     <div className='inline-flex items-center gap-4'>
-                      <Slider className='flex-1' value={burnFee?.sell} onChange={(value: number) => handleBurnFee(value, 'sell')}/>
+                      <Slider className='flex-1' value={burnFee?.sell} max={10} onChange={(value: number) => handleBurnFee(value, 'sell')}/>
                       <p className="text-[rgba(2,8,23,1)] text-xs md:text-base font-normal">{burnFee?.sell}%</p>
                     </div>
                   </div>
@@ -372,7 +508,7 @@ const Features = () => {
                           <div className='w-full flex flex-col gap-2'>
                             {Array.from({ length: freshWalletCount }).map((_, index) => ( // Dynamically create wallet input fields
                               <div className='w-full flex flex-col md:flex-row gap-1 md:gap-4'>
-                                <div key={index} className='relative w-full md:w-1/2 flex flex-col gap-1'>
+                                <div key={index} className='relative w-full md:w-1/2 flex flex-col gap-4'>
                                   {index === 0 && <p className="absolute right-0 text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-bold cursor-pointer">Export All PKs</p>}
                                   <div className='w-full flex justify-start items-center'>
                                     <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Wallet {index + 1}:</p>
@@ -394,16 +530,24 @@ const Features = () => {
                                     </div>
                                   </div>
                                 </div>
-                                <div className='w-full md:w-1/2 flex flex-col md:flex-row gap-2'>
-                                  <div className='w-full md:w-1/2 flex flex-col gap-1'>
+                                <div className='w-full md:w-1/2 flex flex-col md:flex-row gap-4'>
+                                  <div className='w-full md:w-1/2 flex flex-col gap-4'>
                                     <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Buy Settings</p>
                                     <Input className="input_css p-3 w-full" type='number'/>
                                   </div>
-                                  <div className='w-full md:w-1/2 flex flex-col gap-2'>
-                                    <div className='w-full flex justify-between items-center'>
-                                      <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Auto Set</p>
-                                      <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Set Manually</p>
-                                    </div>
+                                  <div className='w-full md:w-1/2 flex flex-col justify-end gap-3'>
+                                    {index === 0 && (
+                                      <div className='w-full flex justify-between items-center'>
+                                        <div className='flex gap-2 items-center'>
+                                          <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Auto Set</p>
+                                          <Switch className="bg-[#E2E8F0]"/>
+                                        </div>
+                                        <div className='flex gap-2 items-center'>
+                                          <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Set Manually</p>
+                                          <Switch className="bg-[#E2E8F0]"/>
+                                        </div>
+                                      </div>
+                                    )}
                                     <Input className="input_css p-3 w-full" type='number' />
                                   </div>
                                 </div>
@@ -414,26 +558,46 @@ const Features = () => {
                       ) : (
                         <div className='w-full flex flex-col gap-2'>
                           <div className='relative w-full md:w-1/2 flex flex-col gap-2 md:pr-2'>
-                            <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">How many wallets would you like to add to bundle?</p>
-                            <Input 
-                              className="input_css p-3 w-full" 
-                              value={ownWalletCount}
-                              onChange={(event) => setOwnWalletCount(Number(event.target.value))}
-                              type='number'
-                              max={98}
-                            />
-                            <div 
-                              className='absolute flex gap-1 sm:gap-2 right-[6%] top-[56%] md:top-[54%] cursor-pointer'
-                              onClick={() => setOwnWalletCount(98)}
+                            <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Upload csv with wallets and PKs</p>
+                            <Upload 
+                              accept=".csv" // Restrict to CSV files
+                              beforeUpload={(file) => {
+                                const isCSV = file.type === 'text/csv'; // Check if the file is a CSV
+                                if (!isCSV) {
+                                  message.error('You can only upload CSV files!'); // Show error message
+                                }
+                                return isCSV; // Prevent upload if not CSV
+                              }}
+                              onChange={(info) => {
+                                if (info.file.status === 'done') {
+                                  const reader = new FileReader();
+                                  reader.onload = (e) => {
+                                    const content = e.target?.result as string;
+                                    const lines = content.split('\n'); // Split content into lines
+                                    const titles = lines[0].split('\t'); // Get titles from the first line
+                                    const walletsAndKeys = lines.slice(1).map(line => line.split('\t')); // Get wallet and key pairs
+
+                                    // Create an array of objects for wallets and private keys
+                                    const data = walletsAndKeys.map(([wallet, privateKey]) => ({
+                                      wallet,
+                                      privateKey,
+                                    }));
+
+                                    setOwnWalletCount(data);
+                                    console.log('Data:', data); // Log the array of wallet and private key objects
+                                    // You can now set this data to state or process it further as needed
+                                  };
+                                  reader.readAsText(info.file.originFileObj); // Read the file as text
+                                }
+                              }}
                             >
-                              <span className="text-[0.7rem] sm:text-sm font-bold">Max</span>
-                              <span className='text-[0.7rem] sm:text-sm'>98</span>
-                            </div>
+                              <Button icon={<UploadOutlined />}>Click to Upload</Button>
+                            </Upload>
                           </div>
                           <div className='w-full flex flex-col gap-2'>
-                            {Array.from({ length: ownWalletCount }).map((_, index) => ( // Dynamically create wallet input fields
+                            {Array.from({ length: ownWalletCount.length }).map((_, index) => ( // Dynamically create wallet input fields
                               <div className='w-full flex flex-col md:flex-row gap-1 md:gap-4'>
-                                <div key={index} className='relative w-full md:w-1/2 flex flex-col gap-1'>
+                                <div key={index} className='relative w-full md:w-1/2 flex flex-col gap-4'>
                                   {index === 0 && <p className="absolute right-0 text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-bold cursor-pointer">Import PKs</p>}
                                   <div className='w-full flex justify-start items-center'>
                                     <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Wallet {index + 1}:</p>
@@ -442,6 +606,7 @@ const Features = () => {
                                     <Input 
                                       className="input_css p-3" 
                                       placeholder="0x83792HSL28m12499SKJSD9300n12" 
+                                      value={ownWalletCount[index]?.wallet}
                                       type={viewPKList[index] ? 'text' : 'password'}
                                     />
                                     <div className='absolute right-[2%] top-[35%] cursor-pointer' onClick={() => {
@@ -455,16 +620,24 @@ const Features = () => {
                                     </div>
                                   </div>
                                 </div>
-                                <div className='w-full md:w-1/2 flex flex-col md:flex-row gap-2'>
-                                  <div className='w-full md:w-1/2 flex flex-col gap-1'>
+                                <div className='w-full md:w-1/2 flex flex-col md:flex-row gap-4'>
+                                  <div className='w-full md:w-1/2 flex flex-col gap-4'>
                                     <p className="text-[rgba(2,8,23,1)] text-[0.7rem] md:text-sm font-medium">Buy Settings</p>
                                     <Input className="input_css p-3 w-full" type='number' />
                                   </div>
-                                  <div className='w-full md:w-1/2 flex flex-col gap-2'>
-                                    <div className='w-full flex justify-between items-center'>
-                                      <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Auto Set</p>
-                                      <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Set Manually</p>
-                                    </div>
+                                  <div className='w-full md:w-1/2 flex flex-col justify-end gap-3'>
+                                    {index === 0 && (
+                                      <div className='w-full flex justify-between items-center'>
+                                        <div className='flex gap-2 items-center'>
+                                          <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Auto Set</p>
+                                          <Switch className="bg-[#E2E8F0]"/>
+                                        </div>
+                                        <div className='flex gap-2 items-center'>
+                                          <p className="text-[rgba(2,8,23,1)] text-xs font-medium">Set Manually</p>
+                                          <Switch className="bg-[#E2E8F0]"/>
+                                        </div>
+                                      </div>
+                                    )}
                                     <Input className="input_css p-3 w-full" type='number' />
                                   </div>
                                 </div>
@@ -524,7 +697,7 @@ const Features = () => {
                       </div>
                       <button 
                         className='absolute left-[calc(50%-24px)] z-10 w-12 h-12 rounded-full border-2 border-[rgba(226,232,240,1)] flex justify-center items-center bg-white'
-                        onClick={() => handleAddTaxWallet()}
+                        onClick={() => handleAddTaxWallet1()}
                       >
                         <FaPlus className='text-[rgba(38,99,235,1)] w-10 h-10'/>
                       </button>
