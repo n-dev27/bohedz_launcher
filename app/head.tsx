@@ -4,7 +4,7 @@ export default function Head() {
       <title>Bohedz Launcher</title>
       <meta content="width=device-width, initial-scale=1" name="viewport" />
       <meta name="description" content="Bohedz Launcher" />
-      <link rel="icon" href="/images/favicon.svg" />
+      <link rel="icon" href="/images/logo/logo.png" />
     </>
   );
 }
