@@ -47,17 +47,17 @@ const Header = () => {
           <div className="relative mx-8 flex items-center justify-between">
             <Link 
               href="/"
-              className="w-fit sm:w-80 max-w-full flex gap-2 cursor-pointer">
+              className="w-fit sm:w-80 max-w-full flex gap-2 cursor-pointer items-center justify-center">
               <div
-                className={`header-logo block w-8 h-8 ${
+                className={`header-logo block w-20 h-20 ${
                   sticky ? "pb-5 lg:pb-2" : "pb-8"
                 } `}
               >
                 <Image
                   src="/images/logo/logo.png"
                   alt="logo"
-                  width={40}
-                  height={40}
+                  width={80}
+                  height={80}
                 />
               </div>
               <p className="hidden sm:flex text-[rgba(2,8,23,1)] text-2xl font-medium">CreateMyToken</p>
